@@ -1,8 +1,7 @@
 # sim-normals
-natural looking normal maps from photos
+natural looking normal maps from photos based on a photoshop script I create in 2008
 
-This is based on a photoshop filter I create around 2009
-The photos should have diffuse lighting and without significant color contrast, shadows will show as depressions. This will use the value information in an image to create a normal map from a single image. 
+The input photos should have diffuse lighting and without significant color contrast, shadows will show as depressions. This will use the value information in an image to create a normal map from a single image. 
 
 This creats a naturaly looking normal map by using pyrimids. You can select the size of detail you extract from the image by setting the min_detail and max_detail parameters. 
 
