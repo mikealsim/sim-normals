@@ -6,5 +6,6 @@ The input photos should have diffuse lighting and without significant color cont
 This creats a naturaly looking normal map by using pyrimids. You can select the size of detail you extract from the image by setting the min_detail and max_detail parameters. 
 
 min_detail gaussian smoothing to remove smaller detials
+
 max_detail high pass to remove larger details, also inderectly controls pyramid levels. 
 
