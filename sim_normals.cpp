@@ -1,6 +1,5 @@
-/** Implimentatin File for create normal maps from photos
+/** Implimentatin File for create normal maps from images
  * Create by Mikeal Simburger 12/29/2019
- * 
  */
 
 #include <opencv2/core/core.hpp>

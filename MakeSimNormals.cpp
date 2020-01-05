@@ -1,52 +1,63 @@
+/** MakeSimNormals, a example usage of simNormals
+ *  converts a images into a natural looking normal map
+ *  Written by Mikeal Simburger 12/29/2019
+ */
+
+#include <opencv2/core/utility.hpp>
+
 #include "sim_normals.h"
 using namespace simNormals;
 
 int main( int argc, char** argv ){
-    double min_detail = 0.0;
-    double max_detail = 0.0;
-    double strength = 0.25;
+  cv::String keys = {"{ h help | | print help }"
+                     "{ i image | | input image path }"
+                     "{ o out_image | | output image path }"
+                     "{ min min_detail | 0.0 | min detail size }"
+                     "{ max max_detail  | 0.0 | max detail size }"
+                     "{ s strength | 0.25 | strength multiplier }"};
 
-    if (argc < 2 || argc > 5) {
-      std::cout << " Usage: makeNormals ImagePath strength[1>0; default:.25] "
-                   "MinDataSize[>= 0.0] MaxDataSize[>= 0.0]"
-                << std::endl;
-      return -1;
-    }
+  cv::CommandLineParser parser(argc, argv, keys);
+  parser.about("MakeSimNormals v1.0.1\nArgument Format: -i=exmaple.jpg");
+  if (parser.has("help")) {
+    parser.printMessage();
+    return 0;
+  }
+  double min_detail = parser.get<double>("min_detail");
+  double max_detail = parser.get<double>("max_detail");
+  double strength = parser.get<double>("strength");
+  std::string img_path = parser.get<std::string>("i");
+  std::string out_path = parser.get<std::string>("o");
+  auto has_output = parser.has("o");
+  if (!parser.check()) {
+    parser.printErrors();
+    return 0;
+  }
+  // check for required input
+  if (!parser.has("i")) {
+    parser.printMessage();
+    return 0;
+  }
 
-    if( argc >= 3){
-      std::string::size_type sz;
-      strength = std::stod(argv[2], &sz);
-      strength = std::max(strength, 0.0);
-    }
+  // default output location for the lazy
+  if (!has_output) {
+    out_path = img_path;
+    std::size_t found = out_path.find_last_of(".");
+    out_path.insert(found, "_normal");
+  }
 
-    if (argc >= 4) {
-      std::string::size_type sz;
-      min_detail = std::stod(argv[3], &sz);
-      min_detail = std::max(min_detail, 0.0);
-    }
-    if (argc == 5) {
-      std::string::size_type sz;
-      max_detail = std::stod(argv[4], &sz);
-      max_detail = std::max(max_detail, 0.0);
-    }
+  cv::Mat image = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
+  if (!image.data) {
+    std::cout << "Could not open or find the image:" << img_path << std::endl;
+    return -1;
+  }
 
-    cv::Mat image = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);   // Read the file
-    if(! image.data )                              // Check for invalid input
-    {
-        std::cout <<  "Could not open or find the image" << std::endl ;
-        return -1;
-    }
-
-     cv::Mat normal;
-     if (!MakeNormals(image, strength, min_detail, max_detail, normal)) {
-       return -1;
-     }
+  cv::Mat normal;
+  if (!MakeNormals(image, strength, min_detail, max_detail, normal)) {
+    return -1;
+  }
 
     normal.convertTo(normal, image.type());    
-    std::string out_path = argv[1];
-    std::size_t found = out_path.find_last_of(".");
-    out_path.insert(found,"_normal"); 
-
     cv::imwrite( out_path, normal);
+    std::cout << "normals written to: " << out_path << "\n";
     return 0;
 }
