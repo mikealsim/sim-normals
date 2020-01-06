@@ -51,13 +51,13 @@ void NormalizeNormals( cv::Mat& normal){
  *   param[in]     single channel cv::Mat, expected data range: [0.0 - 1.0]
  *   return normal_map
 */
-cv::Mat CreateNormal(cv::Mat gray, double stength = .25) {
+cv::Mat CreateNormal(cv::Mat gray, double strength = 1.0) {
   auto ddepth = CV_32F;
   std::vector<cv::Mat> mat_vec(3);
   /// Gradient X
-  cv::Scharr(gray, mat_vec[2], ddepth, 1, 0, stength, 0.0, cv::BORDER_DEFAULT);
+  cv::Scharr(gray, mat_vec[2], ddepth, 1, 0, strength, 0.0, cv::BORDER_DEFAULT);
   /// Gradient Y
-  cv::Scharr(gray, mat_vec[1], ddepth, 0, 1, stength, 0.0, cv::BORDER_DEFAULT);
+  cv::Scharr(gray, mat_vec[1], ddepth, 0, 1, strength, 0.0, cv::BORDER_DEFAULT);
   mat_vec[2] *= -1.0;
   mat_vec[1] *= -1.0;
 
@@ -97,7 +97,7 @@ cv::Mat FastGausianBlur(cv::Mat image, double filter_size, double min_filter_siz
 
 /** Create a natural looking normal map from a Photo
  *  param[in] image        color image
- *  param[in] strength     strength multipler[>=0.0; default .25]
+ *  param[in] strength     strength multipler[>=0.0; default 1.0]
  *  param[in] min_detail   min detail size[>=0.0]
  *  param[in] max_detail   max detail size[>=0.0]
  *  param[out] normal      the normals
@@ -105,8 +105,10 @@ cv::Mat FastGausianBlur(cv::Mat image, double filter_size, double min_filter_siz
  */
 bool MakeNormals(const cv::Mat &image, double strength, double min_detail,
                  double max_detail, cv::Mat &normal) {
+
+  strength *= 4.0;
   if (strength <= 0.0)
-    strength = .25;
+    strength = 1.0;
   constexpr auto kMin_Filter_size = 20.0;
   double data_max_range = 0.0;
   switch (image.depth()) {

@@ -7,36 +7,40 @@
 
 #include "sim_normals.h"
 using namespace simNormals;
+const cv::String keys = {"{ h help about info ?| | print this dialog }"
+                         "{ i image | \"\" | input image path }"
+                         "{ o out_image | \"\" | output image path }"
+                         "{ min min_detail | 0.0 | min detail size }"
+                         "{ max max_detail  | 0.0 | max detail size }"
+                         "{ s strength | 1.0 | strength multiplier }"};
 
-int main( int argc, char** argv ){
-  cv::String keys = {"{ h help | | print help }"
-                     "{ i image | | input image path }"
-                     "{ o out_image | | output image path }"
-                     "{ min min_detail | 0.0 | min detail size }"
-                     "{ max max_detail  | 0.0 | max detail size }"
-                     "{ s strength | 0.25 | strength multiplier }"};
-
+int main(int argc, char **argv) {
   cv::CommandLineParser parser(argc, argv, keys);
-  parser.about("MakeSimNormals v1.0.1\nArgument Format: -i=exmaple.jpg");
+  parser.about("MakeSimNormals v1.0.1\nArgument Format: -x=argument");
+  if (!parser.check()) {
+    parser.printErrors();
+    return 0;
+  }
   if (parser.has("help")) {
     parser.printMessage();
     return 0;
   }
+  // check for required input
+  if (!parser.has("i") || parser.get<std::string>("i").length() <= 4) {
+    std::cout << "ERROR: requires input image\n";
+    parser.printMessage();
+    return 1;
+  }
+
   double min_detail = parser.get<double>("min_detail");
   double max_detail = parser.get<double>("max_detail");
   double strength = parser.get<double>("strength");
   std::string img_path = parser.get<std::string>("i");
   std::string out_path = parser.get<std::string>("o");
+
   auto has_output = parser.has("o");
-  if (!parser.check()) {
-    parser.printErrors();
-    return 0;
-  }
-  // check for required input
-  if (!parser.has("i")) {
-    parser.printMessage();
-    return 0;
-  }
+  if (out_path.length() <= 4)
+    has_output = false;
 
   // default output location for the lazy
   if (!has_output) {
@@ -56,8 +60,8 @@ int main( int argc, char** argv ){
     return -1;
   }
 
-    normal.convertTo(normal, image.type());    
-    cv::imwrite( out_path, normal);
-    std::cout << "normals written to: " << out_path << "\n";
-    return 0;
+  normal.convertTo(normal, image.type());
+  cv::imwrite(out_path, normal);
+  std::cout << "normals written to: " << out_path << "\n";
+  return 0;
 }
