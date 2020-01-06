@@ -106,7 +106,7 @@ cv::Mat FastGausianBlur(cv::Mat image, double filter_size, double min_filter_siz
 bool MakeNormals(const cv::Mat &image, double strength, double min_detail,
                  double max_detail, cv::Mat &normal) {
 
-  strength *= 4.0;
+  strength /= 4.0;
   if (strength <= 0.0)
     strength = 1.0;
   constexpr auto kMin_Filter_size = 20.0;
